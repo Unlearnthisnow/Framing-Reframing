@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Architecture of Insight — Interactive Mind Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #f7f8fa;
+    --surface:   #ffffff;
+    --border:    #e2e6ed;
+    --text-1:    #111827;
+    --text-2:    #4b5563;
+    --text-3:    #9ca3af;
+    --blue-dark: #0d2137;
+    --blue:      #185fa5;
+    --blue-soft: #e8f1fb;
+    --teal:      #1d9e75;
+    --teal-soft: #e6f7f2;
+    --purple:    #3c3489;
+    --purple-soft:#eeedfe;
+    --accent:    #1d9e75;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --shadow:    0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text-1);
+    min-height: 100vh;
+    padding: 0 0 6rem;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--blue-dark);
+    padding: 3.5rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 120%, rgba(29,158,117,0.18) 0%, transparent 70%);
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    border: 1px solid rgba(29,158,117,0.4);
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .hero h1 span { color: var(--teal); }
+  .hero p {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.6);
+    max-width: 520px;
+    margin: 0 auto 1.8rem;
+    line-height: 1.7;
+  }
+  .hero-pills {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .pill {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 20px;
+  }
+  .pill-blue  { background: rgba(24,95,165,0.25); color: #93c5fd; border: 1px solid rgba(24,95,165,0.4); }
+  .pill-purple{ background: rgba(60,52,137,0.25); color: #c4b5fd; border: 1px solid rgba(60,52,137,0.4); }
+  .pill-teal  { background: rgba(29,158,117,0.2); color: #6ee7b7; border: 1px solid rgba(29,158,117,0.35); }
+
+  /* ── HINT BAR ── */
+  .hint-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    padding: 10px;
+    font-size: 0.8rem;
+    color: var(--text-3);
+  }
+  .hint-bar span { color: var(--teal); font-weight: 600; }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+  }
+
+  /* ── NODES ── */
+  .node { margin: 4px 0; }
+
+  .node-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    padding: 7px 10px;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+  }
+  .node-header:hover { background: rgba(0,0,0,0.04); }
+
+  .toggle {
+    width: 22px; height: 22px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    transition: transform 0.22s ease;
+    margin-top: 1px;
+  }
+  .toggle.open { transform: rotate(90deg); }
+
+  .label-wrap { flex: 1; }
+
+  .label {
+    display: inline-block;
+    font-size: 13.5px;
+    border-radius: var(--radius-sm);
+    padding: 6px 13px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .node-desc {
+    font-size: 12px;
+    color: var(--text-2);
+    margin: 5px 0 0 13px;
+    line-height: 1.6;
+  }
+  .node-example {
+    display: inline-block;
+    margin: 5px 0 0 13px;
+    font-size: 11.5px;
+    color: var(--blue);
+    background: var(--blue-soft);
+    border-left: 2.5px solid var(--blue);
+    border-radius: 0 6px 6px 0;
+    padding: 4px 10px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .children {
+    margin-left: 32px;
+    border-left: 2px solid var(--border);
+    padding-left: 10px;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+  .children.open { max-height: 9999px; opacity: 1; }
+
+  /* ── LEVEL STYLES ── */
+  /* Root */
+  .level-root > .node-header .label {
+    background: var(--blue-dark);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    box-shadow: var(--shadow);
+    padding: 10px 18px;
+  }
+  .level-root > .node-header .toggle { background: var(--teal); color: #fff; }
+
+  /* Level 1 */
+  .level-1 > .node-header .label {
+    background: var(--surface);
+    color: var(--blue-dark);
+    font-weight: 700;
+    font-size: 14px;
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .level-1.macro > .node-header .label { border-left: 4px solid var(--blue); }
+  .level-1.micro > .node-header .label { border-left: 4px solid var(--purple); }
+  .level-1.synth > .node-header .label { border-left: 4px solid var(--teal); }
+  .level-1 > .node-header .toggle { background: var(--blue-soft); color: var(--blue); }
+  .level-1.micro > .node-header .toggle { background: var(--purple-soft); color: var(--purple); }
+  .level-1.synth > .node-header .toggle { background: var(--teal-soft); color: var(--teal); }
+
+  /* Level 2 */
+  .level-2 > .node-header .label {
+    background: var(--bg);
+    color: var(--text-1);
+    font-weight: 600;
+    font-size: 13px;
+    border: 1px solid var(--border);
+  }
+  .level-2 > .node-header .toggle { background: var(--border); color: var(--text-2); font-size: 8px; }
+
+  /* Level 3 */
+  .level-3 > .node-header .label {
+    background: transparent;
+    color: var(--text-2);
+    font-weight: 500;
+    font-size: 12.5px;
+    border: 1px solid transparent;
+  }
+  .level-3 > .node-header:hover .label { background: var(--bg); }
+  .level-3 > .node-header .toggle { background: #e5e7eb; color: var(--text-3); font-size: 7px; }
+
+  /* Leaf */
+  .leaf > .node-header { cursor: default; }
+  .leaf > .node-header .label {
+    background: transparent;
+    color: var(--text-2);
+    font-weight: 400;
+    font-size: 12.5px;
+    border: 1px solid transparent;
+    padding: 5px 10px;
+  }
+  .leaf > .node-header .toggle { visibility: hidden; }
+
+  /* ── TAGS ── */
+  .tag {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .tag-macro { background: var(--blue-soft); color: var(--blue); }
+  .tag-micro { background: var(--purple-soft); color: var(--purple); }
+  .tag-synth { background: var(--teal-soft); color: var(--teal); }
+
+  /* ── SECTION DIVIDERS ── */
+  .section-break {
+    margin: 2rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-break-line { flex: 1; height: 1px; background: var(--border); }
+  .section-break-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-3);
+    line-height: 1.8;
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 2.5rem 1rem 2rem; }
+    .container { padding: 1.5rem 1rem; }
+    .children { margin-left: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-eyebrow">Interactive Mind Map</div>
+  <h1>The Architecture<br>of <span>Insight</span></h1>
+  <p>A playbook for shifting perspectives, solving intractable problems, and transforming beliefs through systemic and linguistic reframing.</p>
+  <div class="hero-pills">
+    <span class="pill pill-blue">Problem Reframing · Macro</span>
+    <span class="pill pill-purple">Sleight of Mouth · Micro</span>
+    <span class="pill pill-teal">Wedell-Wedellsborg · Robert Dilts</span>
+  </div>
+</header>
+
+<div class="hint-bar">
+  <span>▶ Click</span> any node to expand &nbsp;·&nbsp; <span>▼ Click</span> again to collapse
+</div>
+
+<div class="container">
+  <div id="map"></div>
+
+  <footer>
+    <div>The Architecture of Insight &nbsp;·&nbsp; Interactive Reference Guide</div>
+    <div style="margin-top:6px;">Synthesizing Problem Reframing (Systemic) and Language Strategies (Linguistic)</div>
+  </footer>
+</div>
+
+<script>
+const data = {
+  label: "Reframing and Language Strategies",
+  children: [
+    {
+      label: "Problem Reframing",
+      tag: "macro", cls: "macro",
+      subtitle: "Wedell-Wedellsborg — External / Systemic",
+      children: [
+        {
+          label: "Core Principle",
+          children: [
+            { label: "Framing determines solutions — the boundaries of a problem dictate its solutions", desc: "A narrow frame yields narrow solutions. The way we define a problem is itself a choice, and that choice shapes every solution we can see.", leaf: true },
+            { label: "Two dimensions of insight", children: [
+              { label: "The Macro Lens (External) — Re-engineering business problems and systems", leaf: true },
+              { label: "The Micro Prism (Internal) — Using language to transform limiting beliefs and perceptions", leaf: true }
+            ]}
+          ]
+        },
+        {
+          label: "Classic Case Study: The Slow Elevator",
+          children: [
+            { label: "Initial Frame: 'The lift is too slow'", desc: "Solution: upgrade the motor, install new algorithms.", example: "Highly expensive, entirely technical approach.", leaf: true },
+            { label: "Reframe: 'The wait is annoying'", desc: "Solution: install mirrors in the lobby.", example: "Extremely cheap, entirely psychological approach.", leaf: true },
+            { label: "The Insight: The actual problem was not mechanical speed — it was the human perception of time", leaf: true }
+          ]
+        },
+        {
+          label: "Rapid Reframing Process",
+          children: [
+            { label: "1. Frame — Establish the baseline", children: [
+              { label: "Ask: 'What problem are we really solving?'", leaf: true },
+              { label: "Identify the critical stakeholders involved", leaf: true },
+              { label: "Formally write down the initial problem definition", leaf: true }
+            ]},
+            { label: "2. Reframe — Break the baseline", children: [
+              { label: "Brainstorm alternative views", leaf: true },
+              { label: "Actively challenge the assumed 'true' cause", leaf: true },
+              { label: "Deploy lateral strategies (like studying Bright Spots)", leaf: true }
+            ]},
+            { label: "3. Move Forward — Test reality", children: [
+              { label: "Deploy prototype solutions in the real world", leaf: true },
+              { label: "Verify the accuracy of the new diagnosis through immediate action", leaf: true }
+            ]}
+          ]
+        },
+        {
+          label: "Five Strategic Lenses to Break a Rigid Frame",
+          children: [
+            { label: "Look outside the frame", desc: "Identify missing factors.", example: "Analyzing competitor market moves rather than obsessing over internal churn metrics.", leaf: true },
+            { label: "Rethink the goal", desc: "Is there a better target?", example: "Shifting from 'increase raw sales volume' to 'maximize customer lifetime value'.", leaf: true },
+            { label: "Study bright spots", desc: "Find the positive exceptions.", example: "Instead of fixing failing branches, reverse-engineer the success of your one high-performing team.", leaf: true },
+            { label: "Look in the mirror", desc: "Assess personal contribution.", example: "Realizing management's own complex approval processes are the true cause of delivery delays.", leaf: true },
+            { label: "Stakeholder perspectives", desc: "Anchor and adjust based on how others view the system.", leaf: true }
+          ]
+        },
+        {
+          label: "Diagnostic Rules for Evaluating Breakthroughs",
+          desc: "Before committing resources to a new frame, run it through the diagnostic test:",
+          children: [
+            { label: "1. Look for surprising insights", desc: "Does the reframe fundamentally challenge the established status quo? If it feels entirely comfortable, it is not a breakthrough.", leaf: true },
+            { label: "2. Seek simple explanations", desc: "Does it cut through accumulated complexity? The best reframes replace a tangled web of symptoms with a single, elegant root cause.", leaf: true },
+            { label: "3. Prioritize breakthrough potential", desc: "Does this new perspective unlock an entirely new category of solutions that were previously invisible?", leaf: true }
+          ]
+        }
+      ]
+    },
+    {
+      label: "Sleight of Mouth",
+      tag: "micro", cls: "micro",
+      subtitle: "Robert Dilts — Internal / Linguistic",
+      children: [
+        {
+          label: "The Pivot",
+          children: [
+            { label: "You cannot solve a reframed external problem with a team trapped by limiting internal beliefs", leaf: true },
+            { label: "Language itself acts as the structural code that creates — and dismantles — our reality", leaf: true }
+          ]
+        },
+        {
+          label: "NLP Foundations: The Map is Not the Territory",
+          children: [
+            { label: "Internal Models", desc: "Our perception (The Map) is fundamentally distinct from objective reality (The Territory). Language modifies the map, not the world.", leaf: true },
+            { label: "Layers of Experience", children: [
+              { label: "Primary Experience — what actually, objectively occurs", leaf: true },
+              { label: "Secondary Experience — the subjective meaning and emotional weight we assign to the event", leaf: true }
+            ]},
+            { label: "Linguistics", children: [
+              { label: "Surface Structure — the actual words spoken out loud", leaf: true },
+              { label: "Deep Structure — the subconscious, hidden meaning and assumptions driving the words", leaf: true }
+            ]}
+          ]
+        },
+        {
+          label: "Primary Thinking Frames",
+          children: [
+            { label: "Outcome Frame — Focus on Goals", desc: "Shifting attention away from the problem and toward the desired state.", example: "'I want to stop failing at this task' → 'I am working to master this skill.'", leaf: true },
+            { label: "Feedback Frame — Errors as Data", desc: "Stripping emotional failure from outcomes, treating them purely as informational inputs.", example: "'The client rejected the pitch, we failed.' → 'This rejection is data proving the market requires a different feature set.'", leaf: true },
+            { label: "As If Frame — Acting on Potential", desc: "Bypassing immediate constraints by simulating a future state to unlock lateral thinking.", example: "'We can't afford to build this.' → 'If we already had an unlimited budget, what exact architecture would we design?'", leaf: true }
+          ]
+        },
+        {
+          label: "Reframing Methods — Core Mechanics of Shifting Meaning",
+          children: [
+            { label: "Context Reframing — Changing the Situation", desc: "Every behavior is useful in some context. A trait that is a liability here might be an asset elsewhere.", example: "'Stubbornness' on a collaborative team becomes 'Tenacity' during a crisis.", leaf: true },
+            { label: "Content Reframing — Changing the Meaning", desc: "The situation remains exactly the same, but its implication shifts based on what we choose to highlight.", example: "A sudden system crash is not a 'disaster'; it's a 'live stress-test revealing hidden vulnerabilities before launch.'", leaf: true },
+            { label: "Outcome Reframing — Pivoting Focus", desc: "Changing the metric of success entirely to render the current problem irrelevant.", leaf: true }
+          ]
+        },
+        {
+          label: "Belief Intervention Patterns",
+          desc: "Base Limiting Belief: 'Our product is too expensive, so we can't sell it.'",
+          children: [
+            { label: "Positive Intent — Benefit behind behavior", desc: "Identify the hidden benefit behind the limiting behavior or objection.", example: "The intent behind our pricing is ensuring uncompromising quality and long-term reliability.", leaf: true },
+            { label: "Redefinition — New labels for experience", desc: "Assign new, structurally different labels to the exact same experience.", example: "We aren't selling an 'expensive product'; we are offering a 'premium, risk-free investment'.", leaf: true },
+            { label: "Consequence — Effects of holding a belief", desc: "Highlight the negative downstream effects of holding the limiting belief.", example: "If we lower the price just to make sales, we lose the margin required to provide elite support.", leaf: true },
+            { label: "Counter-example — Exception to the rule", desc: "Find the absolute exception that breaks the universal rule.", example: "Apple and Porsche hold the highest price points in their categories and dominate market share.", leaf: true },
+            { label: "Hierarchy of Criteria — Prioritizing values", desc: "Elevate the conversation to prioritize a higher-order value.", example: "Isn't delivering long-term ROI more important to our clients than having the cheapest upfront cost?", leaf: true }
+          ]
+        },
+        {
+          label: "Techniques for Deep Change",
+          children: [
+            { label: "Museum of Personal History — Contextualizing the Past", desc: "Recognizing that past beliefs were valid for the environment they were built in.", example: "'We used to believe X, and that served us then. Now our environment demands Y.'", leaf: true },
+            { label: "Natural Cycle of Change — Managing the Transition", desc: "Actively guiding a stakeholder through the necessary emotional stages: from comfortable certainty, through productive doubt, exploration, and finally integrating a new belief.", leaf: true },
+            { label: "Meta-mirror — Systemic Integration", desc: "Forcing individuals to step outside themselves to view the system from multiple, conflicting perspectives simultaneously.", leaf: true }
+          ]
+        }
+      ]
+    },
+    {
+      label: "Synthesis: The Complete Reframing Arsenal",
+      tag: "synth", cls: "synth",
+      children: [
+        { label: "Axis 1 — Problem Reframing (Macro)", children: [
+          { label: "Target: External systems, workflows, and business definitions", leaf: true },
+          { label: "Toolset: Bright spots, stakeholder perspectives, structural analysis", leaf: true },
+          { label: "Goal: Engineering better strategic solutions and avoiding 'wrong problem' traps", leaf: true }
+        ]},
+        { label: "Axis 2 — Sleight of Mouth (Micro)", children: [
+          { label: "Target: Internal linguistics, limiting assumptions, and team psychology", leaf: true },
+          { label: "Toolset: Thinking frames, meaning-shifting, belief intervention matrices", leaf: true },
+          { label: "Goal: Cultivating empowering mindsets capable of executing new strategies", leaf: true }
+        ]},
+        { label: "The Master Insight", desc: "Breakthrough transformation demands both frameworks. Changing the system requires changing the language used to describe it.", children: [
+          { label: "The ultimate advantage is not possessing all the right answers, but maintaining the psychological and linguistic flexibility to instantly change the frame", leaf: true },
+          { label: "The Mandate: When you hit a wall — ask: Am I looking at the right problem? Am I using the right language to describe it?", leaf: true }
+        ]}
+      ]
+    }
+  ]
+};
+
+function buildNode(node, level) {
+  const isLeaf = node.leaf || (!node.children || node.children.length === 0);
+  const div = document.createElement('div');
+  const lvlClass = level === 0 ? 'level-root' : `level-${Math.min(level,3)}`;
+  div.className = `node ${isLeaf ? 'leaf' : ''} ${lvlClass} ${node.cls || ''}`;
+
+  const header = document.createElement('div');
+  header.className = 'node-header';
+
+  const toggle = document.createElement('span');
+  toggle.className = 'toggle';
+  toggle.textContent = isLeaf ? '' : '▶';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'label-wrap';
+
+  const labelEl = document.createElement('span');
+  labelEl.className = 'label';
+  labelEl.textContent = node.label;
+  if (node.tag) {
+    const t = document.createElement('span');
+    t.className = `tag tag-${node.tag}`;
+    t.textContent = node.tag.toUpperCase();
+    labelEl.appendChild(t);
+  }
+  wrap.appendChild(labelEl);
+
+  if (node.subtitle) {
+    const sub = document.createElement('div');
+    sub.style.cssText = 'font-size:11px;color:#9ca3af;margin:3px 0 0 13px;';
+    sub.textContent = node.subtitle;
+    wrap.appendChild(sub);
+  }
+  if (node.desc) {
+    const d = document.createElement('div');
+    d.className = 'node-desc';
+    d.textContent = node.desc;
+    wrap.appendChild(d);
+  }
+  if (node.example) {
+    const e = document.createElement('div');
+    e.className = 'node-example';
+    e.textContent = '→ ' + node.example;
+    wrap.appendChild(e);
+  }
+
+  header.appendChild(toggle);
+  header.appendChild(wrap);
+  div.appendChild(header);
+
+  if (!isLeaf) {
+    const children = document.createElement('div');
+    children.className = 'children';
+    node.children.forEach(child => children.appendChild(buildNode(child, level + 1)));
+    div.appendChild(children);
+
+    header.addEventListener('click', () => {
+      const isOpen = children.classList.contains('open');
+      children.classList.toggle('open', !isOpen);
+      toggle.classList.toggle('open', !isOpen);
+      toggle.textContent = isOpen ? '▶' : '▼';
+    });
+  }
+  return div;
+}
+
+const root = buildNode(data, 0);
+document.getElementById('map').appendChild(root);
+root.querySelector('.node-header').click();
+</script>
+</body>
+</html>
