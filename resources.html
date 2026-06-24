@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlearn This Now — All Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --border: #e2e6ed;
+    --text-1: #111827;
+    --text-2: #4b5563;
+    --text-3: #9ca3af;
+    --blue: #185fa5;
+    --blue-soft: #e8f1fb;
+    --teal: #1d9e75;
+    --teal-soft: #e6f7f2;
+    --purple: #3c3489;
+    --purple-soft: #eeedfe;
+    --dark: #0d2137;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text-1);
+    min-height: 100vh;
+    padding: 0 0 5rem;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--dark);
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+  }
+  .hero-eye {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    border: 1px solid rgba(29,158,117,0.4);
+    border-radius: 20px;
+    padding: 4px 14px;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    color: #fff;
+    margin-bottom: 0.6rem;
+  }
+  .hero h1 span { color: var(--teal); }
+  .hero p {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.55);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* SUPPORT BAR */
+  .support-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .support-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .support-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .support-btn:hover { opacity: 0.8; }
+  .btn-coffee { background: #FFDD00; color: #111; }
+  .btn-paypal { background: #003087; color: #fff; }
+
+  /* MAIN */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* EPISODE CARD */
+  .episode {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 1.2rem;
+    overflow: hidden;
+  }
+  .episode-header {
+    padding: 1.2rem 1.4rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .ep-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--dark);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .ep-info { flex: 1; }
+  .ep-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-1);
+    margin-bottom: 3px;
+    line-height: 1.4;
+  }
+  .ep-subtitle {
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .ep-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+  .tag-new { background: var(--teal-soft); color: var(--teal); }
+
+  /* RESOURCES GRID */
+  .resources {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    padding: 1rem 1.4rem 1.2rem;
+  }
+  .res-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .res-btn:hover { transform: translateY(-1px); }
+  .res-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .res-text { flex: 1; line-height: 1.3; }
+  .res-name { font-weight: 600; }
+  .res-type { font-size: 10px; font-weight: 400; opacity: 0.7; }
+
+  .btn-mindmap {
+    background: var(--blue-soft);
+    color: var(--blue);
+    border-color: #b5d4f4;
+  }
+  .btn-mindmap .res-icon { background: var(--blue); color: #fff; }
+  .btn-mindmap:hover { background: #d4e8f8; }
+
+  .btn-pdf {
+    background: var(--teal-soft);
+    color: var(--teal);
+    border-color: #9fe1cb;
+  }
+  .btn-pdf .res-icon { background: var(--teal); color: #fff; }
+  .btn-pdf:hover { background: #cff0e4; }
+
+  .btn-youtube {
+    background: #fff0f0;
+    color: #c0392b;
+    border-color: #ffc9c9;
+  }
+  .btn-youtube .res-icon { background: #e74c3c; color: #fff; }
+  .btn-youtube:hover { background: #ffe4e4; }
+
+  /* COMING SOON */
+  .coming-soon {
+    background: var(--surface);
+    border: 1.5px dashed var(--border);
+    border-radius: 14px;
+    padding: 1.8rem;
+    text-align: center;
+    color: var(--text-3);
+    font-size: 13px;
+  }
+  .coming-soon-icon { font-size: 28px; margin-bottom: 8px; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 2;
+  }
+  footer a { color: var(--teal); text-decoration: none; }
+
+  @media (max-width: 500px) {
+    .resources { grid-template-columns: 1fr; }
+    .support-bar { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-eye">Resource Library</div>
+  <h1>Unlearn <span>This Now</span></h1>
+  <p>All mind maps, guides, and resources from every episode — in one place.</p>
+</header>
+
+<div class="support-bar">
+  <span class="support-label">Support the channel</span>
+  <a href="https://buymeacoffee.com/unlearnthisnow" target="_blank" class="support-btn btn-coffee">☕ Buy Me a Coffee</a>
+  <a href="https://paypal.me/serghei135" target="_blank" class="support-btn btn-paypal">💳 PayPal</a>
+</div>
+
+<div class="container">
+
+  <div class="section-label">Episodes</div>
+
+  <!-- EPISODE 1 -->
+  <div class="episode">
+    <div class="episode-header">
+      <div class="ep-num">01</div>
+      <div class="ep-info">
+        <div class="ep-title">The Architecture of Insight</div>
+        <div class="ep-subtitle">Problem Reframing · Sleight of Mouth · Wedell-Wedellsborg · Robert Dilts</div>
+      </div>
+      <span class="ep-tag tag-new">New</span>
+    </div>
+    <div class="resources">
+      <a href="https://unlearnthisnow.github.io/Framing-Reframing/" target="_blank" class="res-btn btn-mindmap">
+        <div class="res-icon">🗺</div>
+        <div class="res-text">
+          <div class="res-name">Interactive Mind Map</div>
+          <div class="res-type">Click to explore</div>
+        </div>
+      </a>
+      <a href="https://unlearnthisnow.github.io/Framing-Reframing/Architecture_of_Insight.pdf" target="_blank" class="res-btn btn-pdf">
+        <div class="res-icon">📄</div>
+        <div class="res-text">
+          <div class="res-name">PDF Guide</div>
+          <div class="res-type">Free download</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- COMING SOON -->
+  <div class="coming-soon">
+    <div class="coming-soon-icon">🔜</div>
+    <div><strong>Episode 02 coming soon</strong></div>
+    <div style="margin-top:4px;">New mind map and resources will appear here after each episode.</div>
+  </div>
+
+  <footer>
+    <div>Unlearn This Now &nbsp;·&nbsp; Resource Library</div>
+    <div><a href="https://unlearnthisnow.github.io/Framing-Reframing/">← Back to Mind Map</a></div>
+  </footer>
+
+</div>
+</body>
+</html>
